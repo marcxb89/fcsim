@@ -6,5 +6,6 @@
   "freeze": "variant-freeze",
   "leap": "variant-leap",
   "overpowered": "variant-overpowered",
-  "unbreaking": "variant-unbreaking"
+  "unbreaking": "variant-unbreaking",
+  "badges": "badges"
 }
