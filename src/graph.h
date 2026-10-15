@@ -197,6 +197,10 @@ struct block {
                        reassigns UIDs */
   uint8_t type_id;
   b2Body *body;
+  double initial_angle; /* snapshot of body angle at sim start; used by the
+                           Pilot badge to detect whether a goal piece was ever
+                           rotated by a collision. Not part of the save format
+                           and not included in the design checksum. */
 };
 
 void get_color_by_type(int, int, struct color *);
@@ -286,6 +290,11 @@ void step(struct b2World *world);
 void get_shell(struct shell *shell, struct shape *shape);
 int get_block_joints(struct block *block, struct joint **res);
 bool share_block(struct design *design, struct joint *j1, struct joint *j2);
+
+/* C-callable wrapper around b2Body::GetAngle(). Implemented in
+ * graph_algorithm.cpp so that C files (e.g. badges.c) can read a body's
+ * angle without needing to see the b2Body class definition. */
+double body_get_angle(b2Body *body);
 
 // deep copy, except all b2body are set to nullptr
 struct design *clean_copy_design(struct design *);

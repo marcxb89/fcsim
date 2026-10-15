@@ -7,6 +7,7 @@
 extern "C" {
 #include "graph.h"
 }
+#include <box2d/b2Body.h>
 
 #define CLEAN_COPY(dest, src, attribute_name)                                  \
   (dest).attribute_name = _clean_copy(pointer_map, (src).attribute_name);
@@ -50,6 +51,7 @@ block *_clean_copy(std::unordered_map<void *, void *> &pointer_map,
   new_obj->uid = old_obj->uid;
   new_obj->type_id = old_obj->type_id;
   new_obj->body = nullptr; // intentionally clearing
+  new_obj->initial_angle = old_obj->initial_angle;
   return new_obj;
 }
 
@@ -83,6 +85,10 @@ design *_clean_copy(std::unordered_map<void *, void *> &pointer_map,
   new_obj->expect_checksum = old_obj->expect_checksum;
   new_obj->actual_checksum = old_obj->actual_checksum;
   return new_obj;
+}
+
+extern "C" double body_get_angle(b2Body *body) {
+    return b2Body_GetRotation(body);
 }
 
 extern "C" design *clean_copy_design(design *old_design) {

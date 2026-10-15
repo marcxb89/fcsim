@@ -249,6 +249,7 @@ void arena_init(struct arena *arena, float w, float h, char *xml, int len) {
   /* reset gameplay state (tick, win flag, preview flags) */
   arena->tick = 0;
   arena->has_won = false;
+  arena->earned_badges = 0;
   arena->preview_goal_piece_trajectory = false;
   arena->preview_design = NULL;
   arena->preview_world = NULL;
@@ -302,13 +303,24 @@ bool goal_blocks_inside_goal_area(struct design *design) {
   return any;
 }
 
+/* Snapshot goal-piece body angles so the Pilot badge can later detect whether
+ * any goal piece was rotated by a collision during the run. Must run after
+ * gen_world (bodies exist) and before the first step (angles at rest). */
+static void snapshot_goal_angles(struct design *design) {
+  for (struct block *b = design->design_blocks.head; b; b = b->next) {
+    if (!b->goal) continue;
+    b->initial_angle = body_get_angle(b->body);
+  }
+}
+
 void start(struct arena *arena) {
   free_world(arena->world, &arena->design);
   arena->world = gen_world(&arena->design);
-  // arena->ival = set_interval(tick_func, arena->tick_ms, arena);
+  snapshot_goal_angles(&arena->design);
   arena->hover_joint = NULL;
   arena->tick = 0;
   arena->has_won = false;
+  arena->earned_badges = 0;
 }
 
 void stop(struct arena *arena) {
